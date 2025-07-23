@@ -19,15 +19,18 @@ export default defineConfig({
               That works as expected with `name: undefined`
               But as soon as I want to mark these chunks with some suffix, like `[chunkId].critical`, problems begin
               I cannot replicate the `undefined` behavior:
-                - if I return `name: 'critical`, I get single critical chunk for all my dynamic chunks 🚫
-                - if I use callback, the chunks argument has no id for dynamic chunks, until I gave it a "webpackChunkName" magic comment
+                - if I return `name: 'critical`, I get single critical chunk for all my dynamic chunks
+                - if I use callback, the chunks argument has no id for dynamic chunks, until I gave it a "webpackChunkName" magic comment.
+
+              The last option solves it for me, but I'd prefer not to think about adding magic comments each time I do `import()`.
+              Whats more important, I'd like to solve this problem without rust/js interop, preferrably with somehting like `name: '[parentChunkId].critical'
             */
-            // name: (module, chunks) => {
-            //   if (!chunks[0].id) {
-            //     throw new Error('give dynamic chunk a name!')
-            //   }
-            //   return `${chunks[0].name}.critical`;
-            // },
+            name: (module, chunks) => {
+              if (!chunks[0].name) {
+                throw new Error('give dynamic chunk a name!')
+              }
+              return `${chunks[0].name}.critical`;
+            },
             chunks: "all",
             /* Bug #2: the regexp doesn't work for module.type === 'css/mini-extract' */
             // test: /critical/,
