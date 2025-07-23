@@ -23,7 +23,8 @@ export default defineConfig({
                 - if I use callback, the chunks argument has no id for dynamic chunks, until I gave it a "webpackChunkName" magic comment.
 
               The last option solves it for me, but I'd prefer not to think about adding magic comments each time I do `import()`.
-              Whats more important, I'd like to solve this problem without rust/js interop, preferrably with somehting like `name: '[parentChunkId].critical'
+              Whats more important, I'd like to solve this problem without rust/js interop, preferrably with somehting like `name: '[parentChunkId].critical'`
+              I tried using `idHint: 'critical'`, but it doesn't seem to work at all, maybe I misunderstood what it is supposed to do.
             */
             name: (module, chunks) => {
               if (!chunks[0].name) {
@@ -31,6 +32,8 @@ export default defineConfig({
               }
               return `${chunks[0].name}.critical`;
             },
+            // could be a solution, according to doc, but doesn't work
+            idHint: 'critical',
             chunks: "all",
             /* Bug #2: the regexp doesn't work for module.type === 'css/mini-extract' */
             // test: /critical/,
